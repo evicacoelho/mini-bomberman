@@ -40,6 +40,9 @@ class Menu():
         self.image_background = pygame.image.load(os.path.join(PATH_BACKGROUNDS, 'menu.png')).convert_alpha()
         self.image_background = pygame.transform.scale(self.image_background, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
+        # background music
+        pygame.mixer.music.load(os.path.join(PATH_BACKGROUNDS, 'menu.mp3'))
+        pygame.mixer.music.play(-1)
 
     def draw(
         self
@@ -114,16 +117,14 @@ class Menu():
         self
     ) -> str:
         while True:
+            
+
             # event handling
             result = self.event_handler()
             if result: return result
 
             # visual rendering
             self.draw()
-
-            # background music
-            pygame.mixer.music.load(os.path.join(PATH_BACKGROUNDS, 'menu.mp3'))
-            #pygame.mixer.music.play(-1)
 
             # game anatomy
             pygame.display.flip()
