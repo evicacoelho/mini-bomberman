@@ -6,8 +6,10 @@ from config.const import (
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
 )
+from config.levels import LEVELS
 
 from modules.Menu import Menu
+from modules.Field import Field
 
 class Main():
     def __init__(self):
@@ -23,29 +25,32 @@ class Main():
         menu = Menu(screen)
         menu_result = menu.run()
 
-        if menu_result == '1p':
-            pass
-        elif menu_result == '2p':
-            pass
-        elif menu_result == 'quit':
+        if menu_result == 'quit':
             pygame.quit()
             sys.exit()
 
+        players_count = 1 if menu_result == '1p' else 2
+        current_level = 1
+
+        print(f"""[INFO] Modo de {"1 Jogador" if players_count == 1 else "2 Jogadores"}""")
 
         # failsafe screen
-        run = True
-        while run:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        run = False
-            
-            screen.fill('#FFFFFF')
+        game_running = True
+        while game_running:
+            field = Field(level=current_level)
+            level_result  = field.run(screen=screen)
 
-            pygame.display.flip()
-        
+            if level_result:
+                current_level += 1
+
+            if current_level not in LEVELS:
+                print("[INFO] Acabaram os levels")
+                game_running = False
+
+            else:
+                print("[INFO] Game Over")
+                game_running = False
+
         pygame.quit()
         sys.exit()
 

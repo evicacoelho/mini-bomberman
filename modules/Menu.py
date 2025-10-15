@@ -117,8 +117,6 @@ class Menu():
         self
     ) -> str:
         while True:
-            
-
             # event handling
             result = self.event_handler()
             if result: return result
