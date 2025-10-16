@@ -9,7 +9,7 @@ from config.const import (
 from config.levels import LEVELS
 
 from modules.Menu import Menu
-from modules.Field import Field
+from modules.Game import Game
 
 class Main():
     def __init__(self):
@@ -37,7 +37,7 @@ class Main():
         # failsafe screen
         game_running = True
         while game_running:
-            field = Field(level=current_level)
+            field = Game(level=current_level)
             level_result  = field.run(screen=screen)
 
             if level_result:

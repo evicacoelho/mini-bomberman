@@ -11,6 +11,7 @@ from config.const import (
     GRID_HEIGHT,
     OFFSET_X,
     OFFSET_Y,
+    PATH_BACKGROUNDS,
     PATH_ITEMS,
     PATH_TERRAIN,
     TICK_VALUE,
@@ -26,7 +27,7 @@ class TileType(Enum):
     DOOR = 3        # TODO
     KEYDOOR = 4     # TODO
 
-class Field:
+class Game:
     def __init__(
         self,
         level: int
@@ -47,6 +48,9 @@ class Field:
         # seed de nívels
         random.seed(level * 42)
 
+        # background song
+        pygame.mixer.music.load(os.path.join(PATH_BACKGROUNDS, 'game.mp3'))
+        pygame.mixer.music.play(-1)
 
     def _initialize_grid(self):
         self.tiles = []
@@ -230,4 +234,5 @@ class Field:
         if result is None:
             result = False
 
+        pygame.mixer.music.stop()
         return result

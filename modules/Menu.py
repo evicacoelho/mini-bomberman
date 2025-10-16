@@ -119,7 +119,9 @@ class Menu():
         while True:
             # event handling
             result = self.event_handler()
-            if result: return result
+            if result: 
+                pygame.mixer.music.stop()
+                return result
 
             # visual rendering
             self.draw()
