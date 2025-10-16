@@ -1,0 +1,41 @@
+from typing import Tuple
+
+from modules.Bomb import Bomb
+from modules.Enemy import Enemy
+from modules.Player import Player
+from modules.Explosion import Explosion
+
+
+class EntityFactory:
+    @staticmethod
+    def create_player(
+        name: str,
+    ) -> Player:
+        match name:
+            case 'player1':
+                return Player(name, position=(1, 1))
+            case 'player2':
+                return Player(name, position=(14, 14))
+            
+    @staticmethod
+    def create_enemy(
+        name: str,
+        position: Tuple[int, int],
+    ) -> Enemy:
+        return Enemy(name, position)
+            
+    @staticmethod
+    def create_bomb(
+        position: Tuple[int, int],
+        explosion_range: int,
+        owner
+    ) -> Bomb:
+        return Bomb(position, explosion_range, owner)
+        
+    @staticmethod
+    def create_explosion(
+        position: Tuple[int, int],
+        explosion_range: int,
+        owner
+    ) -> Explosion:
+        return Explosion(position, explosion_range, owner)

@@ -11,8 +11,8 @@ from config.const import (
     GRID_HEIGHT,
     OFFSET_X,
     OFFSET_Y,
-    PATH_BACKGROUNDS,
     PATH_ITEMS,
+    PATH_SOUNDS,
     PATH_TERRAIN,
     TICK_VALUE,
     TILE_SIZE
@@ -49,7 +49,7 @@ class Game:
         random.seed(level * 42)
 
         # background song
-        pygame.mixer.music.load(os.path.join(PATH_BACKGROUNDS, 'game.mp3'))
+        pygame.mixer.music.load(os.path.join(PATH_SOUNDS, 'game.mp3'))
         pygame.mixer.music.play(-1)
 
     def _initialize_grid(self):
@@ -103,7 +103,7 @@ class Game:
                     variants = self.tile_variants.get(tile_type, [])
                     if variants:
                         # Escolhe variante baseada na posição (consistente)
-                        variant_index = (row * 7 + col * 13) % len(variants)
+                        variant_index = random.randint(0, len(variants) - 1)
                         self.variants_map[row].append(variant_index)
                     else:
                         self.variants_map[row].append(0)

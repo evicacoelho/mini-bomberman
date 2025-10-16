@@ -1,29 +1,59 @@
-from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Tuple
+from abc import ABC, abstractmethod
+
+class EntityType(Enum):
+    PLAYER = 'player'
+    ENEMY = 'enemy'
+    BOMB = 'bomb'
+    EXPLOSION = 'explosion'
 
 class Entity(ABC):
     def __init__(
         self,
         name: str,
-        position: Tuple[int, int]
+        position: Tuple[int, int],
+        entity_type: EntityType,
+        speed: int = 1,
     ):
         super().__init__()
         self.name = name
+        self.entity_type = entity_type
         self.position = position
+        self.speed = speed
+        self.hp = 1
+        self.alive = True
 
     @abstractmethod
-    def move_up(self, speed: int):
+    def update(self, game):
         pass
 
     @abstractmethod
-    def move_down(self, speed: int):
+    def render(
+        self,
+        screen,
+        offset_x: int,
+        offset_y: int,
+        tile_size: int,
+    ):
         pass
+
+    def take_damage(
+        self,
+        damage: int = 1,
+    ) -> bool:
+        self.hp -= damage
+        if self.hp <= 0:
+            self.alive = False
+            print(f"[INFO] {self.name} foi destruído")
+        return self.alive
     
-    @abstractmethod
-    def move_left(self, speed: int):
-        pass
-
-    @abstractmethod
-    def move_right(self, speed: int):
-        pass
-
+    def get_grid_position(self) -> Tuple[int, int]:
+        return self.position
+    
+    def set_grid_position(
+        self,
+        grid_x: int,
+        grid_y: int,
+    ) -> Tuple[int, int]:
+        self.position = (grid_x, grid_y)

@@ -5,8 +5,8 @@ from typing import Optional
 
 from config.const import (
     GAME_TITLE,
-    PATH_ASSETS,
-    PATH_BACKGROUNDS, 
+    PATH_BACKGROUNDS,
+    PATH_SOUNDS, 
     TICK_VALUE,
     WINDOW_HEIGHT, 
     WINDOW_WIDTH,
@@ -41,7 +41,7 @@ class Menu():
         self.image_background = pygame.transform.scale(self.image_background, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
         # background music
-        pygame.mixer.music.load(os.path.join(PATH_BACKGROUNDS, 'menu.mp3'))
+        pygame.mixer.music.load(os.path.join(PATH_SOUNDS, 'menu.mp3'))
         pygame.mixer.music.play(-1)
 
     def draw(
