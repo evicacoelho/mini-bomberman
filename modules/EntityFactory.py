@@ -1,5 +1,6 @@
 from typing import Tuple
 
+from config.const import PLAYER_SPAWN_COORDS
 from modules.Bomb import Bomb
 from modules.Enemy import Enemy
 from modules.Player import Player
@@ -13,9 +14,9 @@ class EntityFactory:
     ) -> Player:
         match name:
             case 'player1':
-                return Player(name, position=(1, 1))
+                return Player(name, position=PLAYER_SPAWN_COORDS[name])
             case 'player2':
-                return Player(name, position=(14, 14))
+                return Player(name, position=PLAYER_SPAWN_COORDS[name])
             
     @staticmethod
     def create_enemy(

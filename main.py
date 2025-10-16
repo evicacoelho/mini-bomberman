@@ -37,18 +37,15 @@ class Main():
         # failsafe screen
         game_running = True
         while game_running:
-            field = Game(level=current_level)
+            field = Game(level=current_level, players_count=players_count)
             level_result  = field.run(screen=screen)
 
             if level_result:
                 current_level += 1
+                
 
             if current_level not in LEVELS:
                 print("[INFO] Acabaram os levels")
-                game_running = False
-
-            else:
-                print("[INFO] Game Over")
                 game_running = False
 
         pygame.quit()

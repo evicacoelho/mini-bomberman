@@ -1,7 +1,12 @@
 import os
 import pygame
 
+# A
+ANIMATION_SPEED = 100
+
 # B
+BOMB_COUNT = 10000
+BOMB_RANGE = 2
 
 # C
 CONTROLS = {
@@ -23,19 +28,22 @@ CONTROLS = {
 
 # E
 ENTITY_HEALTH = {
-    "Player1": 1,
-    "Player2": 1,
+    "player1": 3,
+    "player2": 3,
     "EnemyBat": 1,
 }
 ENTITY_SPEED = {
-    "Player1": 3,
-    "Player2": 3,
+    "player1": 1,
+    "player2": 1,
     "EnemyBat": 1,
 }
 ENEMY_MOVE_COOLDOWN = 0
 ENEMY_MOVE_DELAY = 30
+ENEMY_MIN_NUMBER = 2
+ENEMY_MAX_NUMBER = 6
 EXPLOSION_TIMER = 180
 EXPLOSION_DURATION = 45
+EXPLOSION_ANIMATION_SPEED = 75
 
 # G
 GAME_TITLE = "miniBOMBERMAN"
@@ -56,6 +64,12 @@ PATH_FXS = os.path.join(PATH_ASSETS, 'fxs')
 PATH_ITEMS = os.path.join(PATH_ASSETS, 'items')
 PATH_SOUNDS = os.path.join(PATH_ASSETS, 'sounds')
 PATH_TERRAIN = os.path.join(PATH_ASSETS, 'terrain')
+PLAYER_MOVE_COOLDOWN = 20
+PLAYER_MOVE_DELAY = 300
+PLAYER_SPAWN_COORDS = {
+    'player1': (1, 1),
+    'player2': (13, 13)
+}
 
 # T
 TICK_VALUE = 60

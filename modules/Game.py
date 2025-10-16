@@ -3,10 +3,11 @@ import sys
 import pygame
 import random
 
-from enum import Enum
 from typing import List, Tuple
 
 from config.const import (
+    ENEMY_MAX_NUMBER,
+    ENEMY_MIN_NUMBER,
     GRID_LENGTH,
     GRID_HEIGHT,
     OFFSET_X,
@@ -18,21 +19,19 @@ from config.const import (
     TILE_SIZE
 )
 from config.levels import LEVELS
-
-
-class TileType(Enum):
-    TERRAIN = 0     # can walk
-    BLOCK = 1       # cant walk cant break
-    BOX = 2         # cant walk can break
-    DOOR = 3        # TODO
-    KEYDOOR = 4     # TODO
+from modules.TileType import TileType
+from modules.Entity import EntityType
+from modules.EntityFactory import EntityFactory
+from modules.EntityManager import EntityManager
 
 class Game:
     def __init__(
         self,
-        level: int
+        level: int,
+        players_count: int = 1
     ):
         self.level = level
+        self.players_count = players_count
         self.tile_size = TILE_SIZE
         self.grid_height = GRID_HEIGHT
         self.grid_length = GRID_LENGTH
@@ -44,6 +43,9 @@ class Game:
         # inicializador do grid
         self._initialize_grid()
         self.load_tile_images()
+
+        # entidades
+        self.entity_manager = EntityManager()
 
         # seed de nívels
         random.seed(level * 42)
@@ -81,7 +83,6 @@ class Game:
                 TileType.BOX: []
             }
             
-            # Carrega variantes
             for i in range(1, 4):
                 img = pygame.image.load(os.path.join(PATH_TERRAIN, f'grass_{i}.png')).convert_alpha()
                 self.tile_variants[TileType.TERRAIN].append(img)
@@ -94,7 +95,6 @@ class Game:
                 img = pygame.image.load(os.path.join(PATH_ITEMS, f'box_{i}.png')).convert_alpha()
                 self.tile_variants[TileType.BOX].append(img)
             
-            # Preenche o mapa de variantes
             self.variants_map = []
             for row in range(self.grid_height):
                 self.variants_map.append([])
@@ -102,7 +102,6 @@ class Game:
                     tile_type = self.tiles[row][col]
                     variants = self.tile_variants.get(tile_type, [])
                     if variants:
-                        # Escolhe variante baseada na posição (consistente)
                         variant_index = random.randint(0, len(variants) - 1)
                         self.variants_map[row].append(variant_index)
                     else:
@@ -189,13 +188,50 @@ class Game:
                             tile_variants[variant_index],
                             (col * self.tile_size + offset_x, row * self.tile_size + offset_y)
                         )
-                        
+    
+    def initialize_level_entities(self):
+        self.entity_manager.clear_all_entities()
+
+        player1 = EntityFactory.create_player('player1')
+        self.entity_manager.add_entity(player1)
+
+        if self.players_count == 2:
+            player2 = EntityFactory.create_player('player2')
+            self.entity_manager.add_entity(player2)
+
+        # random enemies
+        enemy_count = min(self.level + ENEMY_MIN_NUMBER, ENEMY_MAX_NUMBER)
+        for i in range(enemy_count):
+            while True:
+                x = random.randint(1, self.grid_length - 2)
+                y = random.randint(1, self.grid_height - 2)
+                if self.is_walkable(x, y):
+                    enemy = EntityFactory.create_enemy(f"Enemy{i+1}", (x, y))
+                    self.entity_manager.add_entity(enemy)
+                    break
+
+    def check_game_conditions(self) -> bool:
+        players = self.entity_manager.get_players()
+        enemies = self.entity_manager.get_entities_by_type(entity_type=EntityType.ENEMY)
+
+        # defeat
+        if len(players) == 0:
+            return False
+        
+        # victory
+        if len(enemies) == 0:
+            return True
+        
+        return None
+
     def run(
         self,
         screen: pygame.Surface
     ) -> bool:
         if self.level in LEVELS:
             self.set_level_layout(LEVELS[self.level])
+
+        self.initialize_level_entities()
 
         clock = pygame.time.Clock()
         run = True
@@ -211,22 +247,15 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         run = False
-                    
-                    if event.key == pygame.K_SPACE:
-                        mouse_x, mouse_y = pygame.mouse.get_pos()
-                        grid_x, grid_y = self.pixel_to_grid(mouse_x, mouse_y)
-                        if self.destroy_box(grid_x=grid_x, grid_y=grid_y):
-                            print(f"[INFO] Caixa destruida em {grid_x}, {grid_y}")
 
-                    if event.key == pygame.K_v:  # Vitória (para teste)
-                        print("Vitória simulada!")
-                        result = True
-                    if event.key == pygame.K_d:  # Derrota (para teste)
-                        print("Derrota simulada!")
-                        result = False
+            self.entity_manager.update_entities(self)
+
+            result = self.check_game_conditions()
 
             screen.fill("#FFFFFF")
             self.render(screen)
+
+            self.entity_manager.render_entities(screen, OFFSET_X, OFFSET_Y, self.tile_size)
 
             pygame.display.flip()
             clock.tick(TICK_VALUE) 

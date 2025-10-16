@@ -1,20 +1,20 @@
 from typing import List
 
 from modules.Entity import Entity, EntityType
-from modules.Game import Game, TileType
+from modules.TileType import TileType
 from modules.Player import Player
 
 class EntityManager:
     def __init__(self):
-        self.entities: List[Entity]
-        self.players: List[Player]
+        self.entities: List[Entity] = []
+        self.players: List[Player] = []
     
     def add_entity(self, entity: Entity):
         self.entities.append(entity)
         if entity.entity_type == EntityType.PLAYER:
             self.players.append(entity)
 
-    def update_entities(self, game: Game):
+    def update_entities(self, game):
         for entity in self.entities[:]:
             entity.update(game)
 
@@ -25,7 +25,7 @@ class EntityManager:
 
         self.check_collisions(game)
 
-    def check_collisions(self, game: Game):
+    def check_collisions(self, game):
         for player in self.players:
             for entity in self.entities:
                 if (
@@ -61,3 +61,13 @@ class EntityManager:
     def clear_all_entities(self):
         self.entities.clear()
         self.players.clear()
+
+    def render_entities(
+        self, 
+        screen, 
+        offset_x: int, 
+        offset_y: int, 
+        tile_size: int
+    ):
+        for entity in self.entities:
+            entity.render(screen, offset_x, offset_y, tile_size)

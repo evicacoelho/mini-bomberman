@@ -2,11 +2,7 @@ from enum import Enum
 from typing import Tuple
 from abc import ABC, abstractmethod
 
-class EntityType(Enum):
-    PLAYER = 'player'
-    ENEMY = 'enemy'
-    BOMB = 'bomb'
-    EXPLOSION = 'explosion'
+from modules.EntityType import EntityType
 
 class Entity(ABC):
     def __init__(
