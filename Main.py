@@ -8,6 +8,7 @@ from config.const import (
 )
 from config.levels import LEVELS
 
+from modules.Victory import Victory
 from modules.Menu import Menu
 from modules.Game import Game
 
@@ -46,8 +47,13 @@ class Main():
                 
                 # game win
                 if current_level not in LEVELS:
-                    # TODO
-                    game_running = False
+                    print("[INFO] Todos os níveis completados! Mostrando tela de vitória...")
+                    
+                    victory_screen = Victory(players_count)
+                    should_return_to_menu = victory_screen.run(screen)
+                    
+                    if should_return_to_menu:
+                        return Main.run_game()  
                     
             elif level_result is False:
                 # game over
