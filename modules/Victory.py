@@ -103,20 +103,6 @@ class Victory:
     def render(self, screen: pygame.Surface, current_time: int):
         screen.blit(self.background, (0, 0))
         
-        # Título
-        title_text = self.fonts['large'].render("VITÓRIA!", True, "#FFFF00")
-        title_rect = title_text.get_rect(center=(self.screen_width // 2, 100))
-        screen.blit(title_text, title_rect)
-        
-        # Mensagem de parabéns
-        player_text = "1 Jogador" if self.players_count == 1 else "2 Jogadores"
-        congrats_text = self.fonts['medium'].render(
-            f"Parabéns para {player_text}!",
-            True, "#FFFFFF"
-        )
-        congrats_rect = congrats_text.get_rect(center=(self.screen_width // 2, 180))
-        screen.blit(congrats_text, congrats_rect)
-        
         for i in range(self.players_count):
             if i < len(self.player_animations) and self.animation_frame < len(self.player_animations[i]):
                 player_frame = self.player_animations[i][self.animation_frame]
@@ -125,7 +111,7 @@ class Victory:
         
         if self.can_skip:
             continue_text = self.fonts['small'].render(
-                "Pressione ENTER para voltar ao menu", 
+                "Press ENTER to go back to Main Menu", 
                 True, "#AAAAAA"
             )
             continue_rect = continue_text.get_rect(center=(self.screen_width // 2, self.screen_height - 50))
@@ -133,7 +119,7 @@ class Victory:
         else:
             remaining = (VICTORY_SCREEN_TIME - (current_time - self.start_time)) // 1000 + 1
             countdown_text = self.fonts['small'].render(
-                f"Continuando em {remaining}...", 
+                f"Continuing in {remaining}...", 
                 True, "#AAAAAA"
             )
             countdown_rect = countdown_text.get_rect(center=(self.screen_width // 2, self.screen_height - 50))
