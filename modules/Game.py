@@ -15,6 +15,7 @@ from config.const import (
     PATH_ITEMS,
     PATH_SOUNDS,
     PATH_TERRAIN,
+    STAGE_SCREEN_TIME,
     TICK_VALUE,
     TILE_SIZE
 )
@@ -51,8 +52,8 @@ class Game:
         random.seed(level * 42)
 
         # background song
-        pygame.mixer.music.load(os.path.join(PATH_SOUNDS, 'game.mp3'))
-        pygame.mixer.music.play(-1)
+        self.sounds = {}
+        self.load_sounds()
 
     def _initialize_grid(self):
         self.tiles = []
@@ -73,6 +74,15 @@ class Game:
 
         self.tile_images[TileType.BOX] = pygame.Surface((self.tile_size, self.tile_size))
         self.tile_images[TileType.BOX].fill("#966432")
+
+
+    def load_sounds(self):
+        try:
+            self.sounds['background'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'game.mp3'))
+            self.sounds['stage'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'stage_intro.wav'))
+            pass
+        except Exception as e:
+            print(f"[ERROR] Erro ao carregar sons do inimigo: {e}")
 
 
     def load_tile_images(self):
@@ -110,6 +120,47 @@ class Game:
         except Exception as e:
             print(f"[ERROR] Erro ao carregar imagens: {e}")
             self._create_fallback_tiles()
+
+    def show_stage_screen(self, screen: pygame.Surface) -> bool:
+        clock = pygame.time.Clock()
+        display_time = STAGE_SCREEN_TIME  
+        start_time = pygame.time.get_ticks()
+        
+        try:
+            font_large = pygame.font.Font(None, 72)
+            font_small = pygame.font.Font(None, 36)
+        except:
+            font_large = pygame.font.SysFont('Arial', 72)
+            font_small = pygame.font.SysFont('Arial', 36)
+
+        self.sounds['stage'].play()
+        while pygame.time.get_ticks() - start_time < display_time:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return False
+                    if event.key:
+                        return True
+            
+            # Preenche a tela com preto
+            screen.fill("#000000")
+            
+            # Renderiza "STAGE"
+            stage_text = font_large.render(f"STAGE: {self.level}", True, "#FFFF00")
+            stage_rect = stage_text.get_rect(center=(self.width // 2 + OFFSET_X, self.height // 2 + OFFSET_Y - 50))
+            screen.blit(stage_text, stage_rect)
+            
+            # Renderiza o número da fase
+            level_text = font_small.render("Kill All Your Enemies!", True, "#FFFFFF")
+            level_rect = level_text.get_rect(center=(self.width // 2 + OFFSET_X, self.height // 2 + OFFSET_Y + 20))
+            screen.blit(level_text, level_rect)
+            
+            pygame.display.flip()
+            clock.tick(TICK_VALUE)
+        
+        return True
             
     def set_level_layout(
         self,
@@ -224,44 +275,43 @@ class Game:
         
         return None
 
-    def run(
-        self,
-        screen: pygame.Surface
-    ) -> bool:
+    def run(self, screen: pygame.Surface) -> bool:
         if self.level in LEVELS:
             self.set_level_layout(LEVELS[self.level])
 
         self.initialize_level_entities()
 
+        if not self.show_stage_screen(screen):
+            return None  
+
         clock = pygame.time.Clock()
         run = True
         result = None
 
-        while run and result is None:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    run = False
-                    pygame.quit()
-                    sys.exit()
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
+        self.sounds['background'].play(-1)
+        try:
+            while run and result is None:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
                         run = False
+                        return None
 
-            self.entity_manager.update_entities(self)
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_ESCAPE:
+                            run = False
+                            return None
 
-            result = self.check_game_conditions()
+                self.entity_manager.update_entities(self)
+                result = self.check_game_conditions()
 
-            screen.fill("#FFFFFF")
-            self.render(screen)
+                screen.fill("#FFFFFF")
+                self.render(screen)
+                self.entity_manager.render_entities(screen, OFFSET_X, OFFSET_Y, self.tile_size)
+                pygame.display.flip()
+                clock.tick(TICK_VALUE)
+                
+        finally:
+            self.sounds['background'].stop()
+            pygame.mixer.stop()
 
-            self.entity_manager.render_entities(screen, OFFSET_X, OFFSET_Y, self.tile_size)
-
-            pygame.display.flip()
-            clock.tick(TICK_VALUE) 
-
-        if result is None:
-            result = False
-
-        pygame.mixer.music.stop()
         return result

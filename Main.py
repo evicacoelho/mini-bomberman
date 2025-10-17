@@ -28,24 +28,33 @@ class Main():
         if menu_result == 'quit':
             pygame.quit()
             sys.exit()
-
+        
         players_count = 1 if menu_result == '1p' else 2
         current_level = 1
 
         print(f"""[INFO] Modo de {"1 Jogador" if players_count == 1 else "2 Jogadores"}""")
 
-        # failsafe screen
         game_running = True
         while game_running:
             field = Game(level=current_level, players_count=players_count)
-            level_result  = field.run(screen=screen)
+            level_result = field.run(screen=screen)
 
-            if level_result:
+            if level_result is True:
+                # victory
                 current_level += 1
+                print(f"[INFO] Vitória! Indo para o nível {current_level}")
                 
-
-            if current_level not in LEVELS:
-                print("[INFO] Acabaram os levels")
+                # game win
+                if current_level not in LEVELS:
+                    # TODO
+                    game_running = False
+                    
+            elif level_result is False:
+                # game over
+                print("[INFO] Game Over! Reiniciando nível...")
+                
+            else:
+                # quit
                 game_running = False
 
         pygame.quit()

@@ -50,10 +50,6 @@ GAME_TITLE = "miniBOMBERMAN"
 GRID_LENGTH = 15
 GRID_HEIGHT = 15
 
-# I
-
-# O
-
 # P
 PATH = os.path.join('')
 PATH_ASSETS = os.path.join(PATH, 'assets')
@@ -70,6 +66,9 @@ PLAYER_SPAWN_COORDS = {
     'player1': (1, 1),
     'player2': (13, 13)
 }
+
+# S
+STAGE_SCREEN_TIME = 4000
 
 # T
 TICK_VALUE = 60
