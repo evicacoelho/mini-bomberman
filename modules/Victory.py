@@ -50,19 +50,19 @@ class Victory:
         self.load_player_animations()
     
     def load_player_animations(self):
-        for player_count in range(self.players_count):
+        for player_number in range(self.players_count):
             try:
                 anim_frames = []
                 for frame_count in range(1, 3):  # up to but nor including
-                    frame_path = os.path.join(PATH_CHARACTER, f'win-front_{frame_count}.png')
+                    frame_path = os.path.join(PATH_CHARACTER, f'{player_number+1}_win-front_{frame_count}.png')
                     frame = pygame.image.load(frame_path).convert_alpha()
                     if frame.get_size() != (100, 100):
                         frame = pygame.transform.scale(frame, (100, 100))
                     anim_frames.append(frame)
                 self.player_animations.append(anim_frames)
             except Exception as e:
-                print(f"[ERROR] Erro ao carregar animação do player {player_count+1}: {e}")
-                self.create_fallback_animation(player_count)
+                print(f"[ERROR] Erro ao carregar animação do player {player_number+1}: {e}")
+                self.create_fallback_animation(player_number)
     
     def create_fallback_animation(self, player_index: int):
         colors = ["#FF0000", "#00FF00"]  

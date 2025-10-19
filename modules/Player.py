@@ -25,7 +25,7 @@ class Player(Entity):
     ):
         super().__init__(name, position, EntityType.PLAYER, speed=ENTITY_SPEED[name])
         self.name = name
-        self.player_number = player_number,
+        self.player_number = player_number
         self.alive = True
         self.lives = 1
         self.bomb_count = BOMB_COUNT
@@ -62,22 +62,22 @@ class Player(Entity):
 
     def load_animations(self):
         # idle
-        self.animation_manager.load_animation("idle_front", PATH_CHARACTER, 4, "idle-front_{}.png")
-        self.animation_manager.load_animation("idle_back", PATH_CHARACTER, 4, "idle-back_{}.png")
-        self.animation_manager.load_animation("idle_left", PATH_CHARACTER, 4, "idle-left_{}.png")
-        self.animation_manager.load_animation("idle_right", PATH_CHARACTER, 4, "idle-right_{}.png")
+        self.animation_manager.load_animation("idle_front", PATH_CHARACTER, 4, str(self.player_number)+"_idle-front_{}.png")
+        self.animation_manager.load_animation("idle_back", PATH_CHARACTER, 4, str(self.player_number)+"_idle-back_{}.png")
+        self.animation_manager.load_animation("idle_left", PATH_CHARACTER, 4, str(self.player_number)+"_idle-left_{}.png")
+        self.animation_manager.load_animation("idle_right", PATH_CHARACTER, 4, str(self.player_number)+"_idle-right_{}.png")
         
         # walk
-        self.animation_manager.load_animation("walk_front", PATH_CHARACTER, 4, "walk-front_{}.png")
-        self.animation_manager.load_animation("walk_back", PATH_CHARACTER, 4, "walk-back_{}.png")
-        self.animation_manager.load_animation("walk_left", PATH_CHARACTER, 4, "walk-left_{}.png")
-        self.animation_manager.load_animation("walk_right", PATH_CHARACTER, 4, "walk-right_{}.png")
+        self.animation_manager.load_animation("walk_front", PATH_CHARACTER, 4, str(self.player_number)+"_walk-front_{}.png")
+        self.animation_manager.load_animation("walk_back", PATH_CHARACTER, 4, str(self.player_number)+"_walk-back_{}.png")
+        self.animation_manager.load_animation("walk_left", PATH_CHARACTER, 4, str(self.player_number)+"_walk-left_{}.png")
+        self.animation_manager.load_animation("walk_right", PATH_CHARACTER, 4, str(self.player_number)+"_walk-right_{}.png")
         
         # death
-        self.animation_manager.load_animation("death", PATH_CHARACTER, 5, "death-front_{}.png")
+        self.animation_manager.load_animation("death", PATH_CHARACTER, 5, str(self.player_number)+"_death-front_{}.png")
 
         # win
-        self.animation_manager.load_animation("win", PATH_CHARACTER, 2, "win-front_{}.png")
+        self.animation_manager.load_animation("win", PATH_CHARACTER, 2, str(self.player_number)+"_win-front_{}.png")
 
     def update(self, game):
         current_time = pygame.time.get_ticks()

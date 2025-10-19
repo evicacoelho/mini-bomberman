@@ -14,9 +14,9 @@ class EntityFactory:
     ) -> Player:
         match name:
             case 'player1':
-                return Player(name, position=PLAYER_SPAWN_COORDS[name])
+                return Player(name, player_number=1, position=PLAYER_SPAWN_COORDS[name])
             case 'player2':
-                return Player(name, position=PLAYER_SPAWN_COORDS[name])
+                return Player(name, player_number=2, position=PLAYER_SPAWN_COORDS[name])
             
     @staticmethod
     def create_enemy(
