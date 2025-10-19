@@ -93,12 +93,12 @@ class Game:
                 TileType.BOX: []
             }
             
-            for i in range(1, 4):
-                img = pygame.image.load(os.path.join(PATH_TERRAIN, f'grass_{i}.png')).convert_alpha()
+            for i in range(1, LEVELS[self.level]['terrain']['variations']):
+                img = pygame.image.load(os.path.join(PATH_TERRAIN, f'{LEVELS[self.level]['terrain']['asset_name']}_{i}.png')).convert_alpha()
                 self.tile_variants[TileType.TERRAIN].append(img)
             
-            for i in range(1, 5):
-                img = pygame.image.load(os.path.join(PATH_TERRAIN, f'wood_{i}.png')).convert_alpha()
+            for i in range(1, LEVELS[self.level]['block']['variations']):
+                img = pygame.image.load(os.path.join(PATH_TERRAIN, f'{LEVELS[self.level]['block']['asset_name']}_{i}.png')).convert_alpha()
                 self.tile_variants[TileType.BLOCK].append(img)
             
             for i in range(1, 10):
@@ -277,7 +277,7 @@ class Game:
 
     def run(self, screen: pygame.Surface) -> bool:
         if self.level in LEVELS:
-            self.set_level_layout(LEVELS[self.level])
+            self.set_level_layout(LEVELS[self.level]['layout'])
 
         self.initialize_level_entities()
 

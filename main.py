@@ -8,9 +8,9 @@ from config.const import (
 )
 from config.levels import LEVELS
 
-from modules.Victory import Victory
 from modules.Menu import Menu
 from modules.Game import Game
+from modules.Victory import Victory
 
 class Main():
     def __init__(self):
