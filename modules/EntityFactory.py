@@ -37,6 +37,7 @@ class EntityFactory:
     def create_explosion(
         position: Tuple[int, int],
         explosion_range: int,
-        owner
+        owner,
+        game,
     ) -> Explosion:
-        return Explosion(position, explosion_range, owner)
+        return Explosion(position, explosion_range, owner, game)

@@ -5,7 +5,7 @@ import pygame
 ANIMATION_SPEED = 100
 
 # B
-BOMB_COUNT = 10000
+BOMB_COUNT = 1
 BOMB_RANGE = 2
 
 # C

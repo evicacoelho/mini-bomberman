@@ -31,6 +31,7 @@ class Player(Entity):
         self.bomb_count = BOMB_COUNT
         self.bomb_range = BOMB_RANGE
         self.placed_bombs: List[Bomb] = []
+        self.bomb_key_held = False
         self.last_direction = 'front'
         self.moving = False
 
@@ -129,8 +130,12 @@ class Player(Entity):
             self.moving = True
             self.move_cooldown = current_time + self.move_delay // 2
 
-        if keys[self.controls['bomb']] and len(self.placed_bombs) < self.bomb_count:
+        # uma bomba por toque, liberando o limite quando a bomba explode
+        self.placed_bombs = [bomb for bomb in self.placed_bombs if bomb.alive]
+        bomb_pressed = keys[self.controls['bomb']]
+        if bomb_pressed and not self.bomb_key_held and len(self.placed_bombs) < self.bomb_count:
             self.place_bomb(game)
+        self.bomb_key_held = bomb_pressed
 
         if self.moving:
             animation_name = f"walk_{self.last_direction}"
@@ -160,13 +165,12 @@ class Player(Entity):
         game
     ):
         from modules.EntityFactory import EntityFactory
+        if any(e.entity_type == EntityType.BOMB and e.position == self.position
+               for e in game.entity_manager.entities):
+            return
         bomb = EntityFactory.create_bomb(self.position, self.bomb_range, self)
-        
         self.placed_bombs.append(bomb)
         game.entity_manager.add_entity(bomb)
-
-        if not bomb.alive:
-            self.placed_bombs.remove(bomb)
         
     def lose_life(self) -> bool:
         if self.state != "alive":

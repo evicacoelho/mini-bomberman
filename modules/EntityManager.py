@@ -34,22 +34,21 @@ class EntityManager:
                 ):
                     player.lose_life()
 
-                elif entity.entity_type == EntityType.EXPLOSION:
-                    explosion = entity
-                    if player.get_grid_position() in explosion.affected_tiles:
-                        player.lose_life()
+                elif (
+                    entity.entity_type == EntityType.EXPLOSION and
+                    player.get_grid_position() in entity.affected_tiles
+                ):
+                    player.lose_life()
 
-                    for other_entity in self.entities:
-                        if (
-                            other_entity.entity_type == EntityType.ENEMY and
-                            other_entity.get_grid_position() in explosion.affected_tiles
-                        ):
-                            other_entity.take_damage()
+        # explosões afetam inimigos e caixas uma vez, com ou sem jogadores vivos
+        for explosion in self.get_entities_by_type(EntityType.EXPLOSION):
+            for enemy in self.get_entities_by_type(EntityType.ENEMY):
+                if enemy.alive and enemy.get_grid_position() in explosion.affected_tiles:
+                    enemy.take_damage()
 
-                    for tile in explosion.affected_tiles:
-                        grid_x, grid_y = tile
-                        if game.get_tile_at_position(grid_x, grid_y) == TileType.BOX:
-                            game.destroy_box(grid_x, grid_y)
+            for grid_x, grid_y in explosion.affected_tiles:
+                if game.get_tile_at_position(grid_x, grid_y) == TileType.BOX:
+                    game.destroy_box(grid_x, grid_y)
                         
     # getters/setters
     def get_players(self) -> List[Player]:

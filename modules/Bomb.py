@@ -58,7 +58,8 @@ class Bomb(Entity):
         explosion = EntityFactory.create_explosion(
             self.position,
             self.explosion_range,
-            self.owner
+            self.owner,
+            game,
         )
 
         game.entity_manager.add_entity(explosion)
