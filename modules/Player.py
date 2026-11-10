@@ -5,9 +5,10 @@ import pygame
 from config.const import (
     BOMB_COUNT, 
     BOMB_RANGE, 
-    CONTROLS, ENTITY_SPEED, 
+    CONTROLS, ENTITY_HEALTH, ENTITY_SPEED, 
     PATH_CHARACTER,
     PATH_SOUNDS, 
+    PLAYER_INVINCIBILITY_TIME,
     PLAYER_MOVE_COOLDOWN, 
     PLAYER_MOVE_DELAY
 )
@@ -27,7 +28,8 @@ class Player(Entity):
         self.name = name
         self.player_number = player_number
         self.alive = True
-        self.lives = 1
+        self.lives = ENTITY_HEALTH[name]
+        self.invincible_until = 0
         self.bomb_count = BOMB_COUNT
         self.bomb_range = BOMB_RANGE
         self.placed_bombs: List[Bomb] = []
@@ -173,20 +175,27 @@ class Player(Entity):
         game.entity_manager.add_entity(bomb)
         
     def lose_life(self) -> bool:
-        if self.state != "alive":
+        now = pygame.time.get_ticks()
+        if self.state != "alive" or now < self.invincible_until:
             return False
-            
+
         self.lives -= 1
         if self.lives <= 0:
             self.start_death_animation()
             return True
-        
+
+        self.invincible_until = now + PLAYER_INVINCIBILITY_TIME
         return False
     
     def get_life(self) -> int:
-        return self.life
+        return self.lives
         
     def render(self, screen, offset_x: int, offset_y: int, tile_size: int):
+        # pisca enquanto invencível
+        now = pygame.time.get_ticks()
+        if self.state == "alive" and now < self.invincible_until and (now // 100) % 2:
+            return
+
         pixel_x = self.position[0] * tile_size + offset_x
         pixel_y = self.position[1] * tile_size + offset_y
         

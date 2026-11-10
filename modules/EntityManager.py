@@ -16,6 +16,7 @@ class EntityManager:
 
     def update_entities(self, game):
         for entity in self.entities[:]:
+            entity.previous_position = entity.position
             entity.update(game)
 
             if not entity.alive:
@@ -28,9 +29,11 @@ class EntityManager:
     def check_collisions(self, game):
         for player in self.players:
             for entity in self.entities:
-                if (
-                    entity.entity_type == EntityType.ENEMY and
-                    entity.get_grid_position() == player.get_grid_position()
+                if entity.entity_type == EntityType.ENEMY and (
+                    entity.get_grid_position() == player.get_grid_position() or
+                    # trocaram de tile no mesmo frame: passaram um pelo outro
+                    (entity.position == player.previous_position and
+                     entity.previous_position == player.position)
                 ):
                     player.lose_life()
 

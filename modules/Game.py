@@ -8,6 +8,7 @@ from typing import List, Tuple
 from config.const import (
     ENEMY_MAX_NUMBER,
     ENEMY_MIN_NUMBER,
+    ENEMY_SPAWN_MIN_DISTANCE,
     GRID_LENGTH,
     GRID_HEIGHT,
     OFFSET_X,
@@ -15,6 +16,7 @@ from config.const import (
     PATH_ITEMS,
     PATH_SOUNDS,
     PATH_TERRAIN,
+    PLAYER_SPAWN_COORDS,
     STAGE_SCREEN_TIME,
     TICK_VALUE,
     TILE_SIZE
@@ -121,7 +123,8 @@ class Game:
             print(f"[ERROR] Erro ao carregar imagens: {e}")
             self._create_fallback_tiles()
 
-    def show_stage_screen(self, screen: pygame.Surface) -> bool:
+    def show_stage_screen(self, screen: pygame.Surface):
+        """Retorna True para jogar, 'menu' no ESC, None ao fechar a janela."""
         clock = pygame.time.Clock()
         display_time = STAGE_SCREEN_TIME  
         start_time = pygame.time.get_ticks()
@@ -137,10 +140,10 @@ class Game:
         while pygame.time.get_ticks() - start_time < display_time:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return False
+                    return None
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        return False
+                        return 'menu'
                     if event.key:
                         return True
             
@@ -186,7 +189,12 @@ class Game:
         grid_y: int,
     ) -> bool:
         tile_type = self.get_tile_at_position(grid_x=grid_x, grid_y=grid_y)
-        return tile_type == TileType.TERRAIN
+        if tile_type != TileType.TERRAIN:
+            return False
+        return not any(
+            entity.entity_type == EntityType.BOMB and entity.position == (grid_x, grid_y)
+            for entity in self.entity_manager.entities
+        )
     
     def destroy_box(self, grid_x: int, grid_y: int) -> bool:
         if (0 <= grid_x < self.grid_length and 0 <= grid_y < self.grid_height and
@@ -252,14 +260,27 @@ class Game:
 
         # random enemies
         enemy_count = min(self.level + ENEMY_MIN_NUMBER, ENEMY_MAX_NUMBER)
+        player_spawns = [player.position for player in self.entity_manager.get_players()]
         for i in range(enemy_count):
             while True:
                 x = random.randint(1, self.grid_length - 2)
                 y = random.randint(1, self.grid_height - 2)
-                if self.is_walkable(x, y):
+                too_close = any(
+                    abs(x - px) + abs(y - py) < ENEMY_SPAWN_MIN_DISTANCE
+                    for px, py in player_spawns
+                )
+                if self.is_walkable(x, y) and not too_close:
                     enemy = EntityFactory.create_enemy(f"Enemy{i+1}", (x, y))
                     self.entity_manager.add_entity(enemy)
                     break
+
+    def render_hud(self, screen: pygame.Surface, font: pygame.font.Font):
+        # vidas sobre a fileira de blocos do topo
+        text = "   ".join(
+            f"P{player.player_number}: {max(player.lives, 0)} vidas"
+            for player in self.entity_manager.get_players()
+        )
+        screen.blit(font.render(text, True, "#FFFFFF"), (OFFSET_X + 8, OFFSET_Y + 8))
 
     def check_game_conditions(self) -> bool:
         players = self.entity_manager.get_players()
@@ -281,10 +302,12 @@ class Game:
 
         self.initialize_level_entities()
 
-        if not self.show_stage_screen(screen):
-            return None  
+        stage_result = self.show_stage_screen(screen)
+        if stage_result is not True:
+            return stage_result
 
         clock = pygame.time.Clock()
+        hud_font = pygame.font.Font(None, 24)
         run = True
         result = None
 
@@ -299,7 +322,7 @@ class Game:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             run = False
-                            return None
+                            return 'menu'
 
                 self.entity_manager.update_entities(self)
                 result = self.check_game_conditions()
@@ -307,6 +330,7 @@ class Game:
                 screen.fill("#FFFFFF")
                 self.render(screen)
                 self.entity_manager.render_entities(screen, OFFSET_X, OFFSET_Y, self.tile_size)
+                self.render_hud(screen, hud_font)
                 pygame.display.flip()
                 clock.tick(TICK_VALUE)
                 

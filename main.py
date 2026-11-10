@@ -13,58 +13,50 @@ from modules.Game import Game
 from modules.Victory import Victory
 
 class Main():
-    def __init__(self):
-        pass
-
     @staticmethod
     def run_game():
         pygame.init()
         screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.display.set_caption(GAME_TITLE)
 
-        # menu inicial
-        menu = Menu(screen)
-        menu_result = menu.run()
+        while True:
+            # menu inicial
+            menu_result = Menu(screen).run()
+            if menu_result == 'quit':
+                break
 
-        if menu_result == 'quit':
-            pygame.quit()
-            sys.exit()
-        
-        players_count = 1 if menu_result == '1p' else 2
-        current_level = 1
+            players_count = 1 if menu_result == '1p' else 2
+            print(f"""[INFO] Modo de {"1 Jogador" if players_count == 1 else "2 Jogadores"}""")
 
-        print(f"""[INFO] Modo de {"1 Jogador" if players_count == 1 else "2 Jogadores"}""")
-
-        game_running = True
-        while game_running:
-            field = Game(level=current_level, players_count=players_count)
-            level_result = field.run(screen=screen)
-
-            if level_result is True:
-                # victory
-                current_level += 1
-                print(f"[INFO] Vitória! Indo para o nível {current_level}")
-                
-                # game win
-                if current_level not in LEVELS:
-                    print("[INFO] Todos os níveis completados! Mostrando tela de vitória...")
-                    
-                    victory_screen = Victory(players_count)
-                    should_return_to_menu = victory_screen.run(screen)
-                    
-                    if should_return_to_menu:
-                        return Main.run_game()  
-                    
-            elif level_result is False:
-                # game over
-                print("[INFO] Game Over! Reiniciando nível...")
-                
-            else:
-                # quit
-                game_running = False
+            if Main.play_levels(screen, players_count) == 'quit':
+                break
 
         pygame.quit()
         sys.exit()
+
+    @staticmethod
+    def play_levels(screen, players_count: int) -> str:
+        """Joga os níveis em sequência. Retorna 'menu' ou 'quit'."""
+        current_level = 1
+        while True:
+            level_result = Game(level=current_level, players_count=players_count).run(screen=screen)
+
+            if level_result is True:
+                current_level += 1
+                print(f"[INFO] Vitória! Indo para o nível {current_level}")
+
+                if current_level not in LEVELS:
+                    print("[INFO] Todos os níveis completados! Mostrando tela de vitória...")
+                    Victory(players_count).run(screen)
+                    return 'menu'
+
+            elif level_result is False:
+                print("[INFO] Game Over! Voltando ao menu...")
+                return 'menu'
+
+            else:
+                # 'menu' (ESC) ou None (fechou a janela)
+                return 'menu' if level_result == 'menu' else 'quit'
 
 if __name__ == "__main__":
     Main.run_game()

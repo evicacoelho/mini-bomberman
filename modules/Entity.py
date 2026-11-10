@@ -16,6 +16,7 @@ class Entity(ABC):
         self.name = name
         self.entity_type = entity_type
         self.position = position
+        self.previous_position = position
         self.speed = speed
         self.hp = 1
         self.alive = True

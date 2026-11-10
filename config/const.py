@@ -40,6 +40,7 @@ ENTITY_SPEED = {
 ENEMY_MOVE_COOLDOWN = 0
 ENEMY_MOVE_DELAY = 30
 ENEMY_MIN_NUMBER = 2
+ENEMY_SPAWN_MIN_DISTANCE = 4  # distância de Manhattan até o spawn dos jogadores
 ENEMY_MAX_NUMBER = 6
 EXPLOSION_TIMER = 180
 EXPLOSION_DURATION = 45
@@ -61,6 +62,7 @@ PATH_ITEMS = os.path.join(PATH_ASSETS, 'items')
 PATH_SOUNDS = os.path.join(PATH_ASSETS, 'sounds')
 PATH_TERRAIN = os.path.join(PATH_ASSETS, 'terrain')
 PLAYER_MOVE_COOLDOWN = 20
+PLAYER_INVINCIBILITY_TIME = 2000  # ms após levar dano; precisa cobrir a explosão (45 frames ≈ 750 ms)
 PLAYER_MOVE_DELAY = 300
 PLAYER_SPAWN_COORDS = {
     'player1': (1, 1),
