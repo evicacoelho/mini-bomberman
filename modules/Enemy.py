@@ -5,6 +5,7 @@ import pygame
 
 from config.const import ENEMY_MOVE_COOLDOWN, ENEMY_MOVE_DELAY, PATH_ENEMIES, PATH_SOUNDS
 from modules.AnimationManager import AnimationManager
+from modules.assets import load_sound
 from modules.Entity import Entity, EntityType
 
 
@@ -15,7 +16,7 @@ class Enemy(Entity):
         position
     ):
         super().__init__(name, position, EntityType.ENEMY, speed=1)
-        self.move_cooldown = ENEMY_MOVE_COOLDOWN
+        self.next_move_at = pygame.time.get_ticks() + ENEMY_MOVE_COOLDOWN
         self.move_delay = ENEMY_MOVE_DELAY
         self.last_direction = 'front'
         self.moving = False
@@ -42,9 +43,9 @@ class Enemy(Entity):
 
     def load_sounds(self):
         try:
-            self.sounds['walking'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'enemy_walking.wav'))
+            self.sounds['walking'] = load_sound(os.path.join(PATH_SOUNDS, 'enemy_walking.wav'))
             self.sounds['walking'].set_volume(0.1)
-            self.sounds['death'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'enemy_dies.wav'))
+            self.sounds['death'] = load_sound(os.path.join(PATH_SOUNDS, 'enemy_dies.wav'))
             pass
         except Exception as e:
             print(f"[ERROR] Erro ao carregar sons do inimigo: {e}")
@@ -53,10 +54,9 @@ class Enemy(Entity):
     def update(self, game):
         current_time = pygame.time.get_ticks()
         
-        self.move_cooldown -= 1
-        if self.move_cooldown <= 0:
+        if current_time >= self.next_move_at:
             self.random_move(game)
-            self.move_cooldown = self.move_delay
+            self.next_move_at = current_time + self.move_delay
             self.moving = True
         else:
             self.moving = False
@@ -94,15 +94,3 @@ class Enemy(Entity):
             self.sounds['death'].play()
             pass
         return result
-
-    def render(self, screen, offset_x: int, offset_y: int, tile_size: int):
-        pixel_x = self.position[0] * tile_size + offset_x
-        pixel_y = self.position[1] * tile_size + offset_y
-        
-        current_frame = self.animation_manager.get_current_frame()
-        
-        # Escala a imagem para o tamanho do tile se necessário
-        if current_frame.get_size() != (tile_size, tile_size):
-            current_frame = pygame.transform.scale(current_frame, (tile_size, tile_size))
-        
-        screen.blit(current_frame, (pixel_x, pixel_y))

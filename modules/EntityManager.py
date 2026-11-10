@@ -2,17 +2,17 @@ from typing import List
 
 from modules.Entity import Entity, EntityType
 from modules.TileType import TileType
-from modules.Player import Player
 
 class EntityManager:
     def __init__(self):
         self.entities: List[Entity] = []
-        self.players: List[Player] = []
+
+    @property
+    def players(self) -> List[Entity]:
+        return self.get_entities_by_type(EntityType.PLAYER)
     
     def add_entity(self, entity: Entity):
         self.entities.append(entity)
-        if entity.entity_type == EntityType.PLAYER:
-            self.players.append(entity)
 
     def update_entities(self, game):
         for entity in self.entities[:]:
@@ -21,8 +21,6 @@ class EntityManager:
 
             if not entity.alive:
                 self.entities.remove(entity)
-                if entity.entity_type == EntityType.PLAYER:
-                    self.players.remove(entity)
 
         self.check_collisions(game)
 
@@ -54,7 +52,7 @@ class EntityManager:
                     game.destroy_box(grid_x, grid_y)
                         
     # getters/setters
-    def get_players(self) -> List[Player]:
+    def get_players(self) -> List[Entity]:
         return self.players
     
     def get_entities_by_type(self, entity_type: EntityType) -> List[Entity]:
@@ -62,7 +60,6 @@ class EntityManager:
     
     def clear_all_entities(self):
         self.entities.clear()
-        self.players.clear()
 
     def render_entities(
         self, 

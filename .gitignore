@@ -7,3 +7,4 @@ dist/*
 miniBOMBERMAN.spec
 output/*
 main.spec
+__pycache__/

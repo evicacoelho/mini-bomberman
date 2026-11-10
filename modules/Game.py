@@ -24,7 +24,9 @@ from config.const import (
 from config.levels import LEVELS
 from modules.TileType import TileType
 from modules.Entity import EntityType
-from modules.EntityFactory import EntityFactory
+from modules.assets import load_image, load_sound
+from modules.Enemy import Enemy
+from modules.Player import Player
 from modules.EntityManager import EntityManager
 
 class Game:
@@ -80,8 +82,8 @@ class Game:
 
     def load_sounds(self):
         try:
-            self.sounds['background'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'game.mp3'))
-            self.sounds['stage'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'stage_intro.wav'))
+            self.sounds['background'] = load_sound(os.path.join(PATH_SOUNDS, 'game.mp3'))
+            self.sounds['stage'] = load_sound(os.path.join(PATH_SOUNDS, 'stage_intro.wav'))
             pass
         except Exception as e:
             print(f"[ERROR] Erro ao carregar sons do inimigo: {e}")
@@ -95,16 +97,16 @@ class Game:
                 TileType.BOX: []
             }
             
-            for i in range(1, LEVELS[self.level]['terrain']['variations']):
-                img = pygame.image.load(os.path.join(PATH_TERRAIN, f'{LEVELS[self.level]['terrain']['asset_name']}_{i}.png')).convert_alpha()
+            for i in range(1, LEVELS[self.level]['terrain']['variations'] + 1):
+                img = load_image(os.path.join(PATH_TERRAIN, f'{LEVELS[self.level]['terrain']['asset_name']}_{i}.png'))
                 self.tile_variants[TileType.TERRAIN].append(img)
             
-            for i in range(1, LEVELS[self.level]['block']['variations']):
-                img = pygame.image.load(os.path.join(PATH_TERRAIN, f'{LEVELS[self.level]['block']['asset_name']}_{i}.png')).convert_alpha()
+            for i in range(1, LEVELS[self.level]['block']['variations'] + 1):
+                img = load_image(os.path.join(PATH_TERRAIN, f'{LEVELS[self.level]['block']['asset_name']}_{i}.png'))
                 self.tile_variants[TileType.BLOCK].append(img)
             
             for i in range(1, 10):
-                img = pygame.image.load(os.path.join(PATH_ITEMS, f'box_{i}.png')).convert_alpha()
+                img = load_image(os.path.join(PATH_ITEMS, f'box_{i}.png'))
                 self.tile_variants[TileType.BOX].append(img)
             
             self.variants_map = []
@@ -251,12 +253,11 @@ class Game:
     def initialize_level_entities(self):
         self.entity_manager.clear_all_entities()
 
-        player1 = EntityFactory.create_player('player1')
-        self.entity_manager.add_entity(player1)
-
-        if self.players_count == 2:
-            player2 = EntityFactory.create_player('player2')
-            self.entity_manager.add_entity(player2)
+        for number in range(1, self.players_count + 1):
+            name = f'player{number}'
+            self.entity_manager.add_entity(
+                Player(name, position=PLAYER_SPAWN_COORDS[name], player_number=number)
+            )
 
         # random enemies
         enemy_count = min(self.level + ENEMY_MIN_NUMBER, ENEMY_MAX_NUMBER)
@@ -270,7 +271,7 @@ class Game:
                     for px, py in player_spawns
                 )
                 if self.is_walkable(x, y) and not too_close:
-                    enemy = EntityFactory.create_enemy(f"Enemy{i+1}", (x, y))
+                    enemy = Enemy(f"Enemy{i+1}", (x, y))
                     self.entity_manager.add_entity(enemy)
                     break
 

@@ -2,7 +2,8 @@ import os
 import pygame
 from typing import Dict
 
-from config.const import ANIMATION_SPEED
+from config.const import ANIMATION_SPEED, TILE_SIZE
+from modules.assets import load_image
 
 class AnimationManager:
     def __init__(self):
@@ -23,13 +24,13 @@ class AnimationManager:
         for i in range(1, frame_count + 1):
             try:
                 frame_path = os.path.join(base_path, file_pattern.format(i))
-                image = pygame.image.load(frame_path).convert_alpha()
+                image = load_image(frame_path, (TILE_SIZE, TILE_SIZE))
                 frames.append(image)
             except Exception as e:
                 print(f"[ERROR] Erro ao carregar frame {i} para {animation_name}: {e}")
-                fallback_surface = pygame.Surface((32, 32), pygame.SRCALPHA)
+                fallback_surface = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
                 color = "#FF0000" if "enemy" in animation_name else "#00FF00"
-                pygame.draw.rect(fallback_surface, color, (0, 0, 32, 32))
+                fallback_surface.fill(color)
                 frames.append(fallback_surface)
         
         self.animations[animation_name] = {

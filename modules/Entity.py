@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Tuple
 from abc import ABC, abstractmethod
 
@@ -25,7 +24,6 @@ class Entity(ABC):
     def update(self, game):
         pass
 
-    @abstractmethod
     def render(
         self,
         screen,
@@ -33,7 +31,11 @@ class Entity(ABC):
         offset_y: int,
         tile_size: int,
     ):
-        pass
+        # frames já vêm no tamanho do tile (AnimationManager)
+        screen.blit(
+            self.animation_manager.get_current_frame(),
+            (self.position[0] * tile_size + offset_x, self.position[1] * tile_size + offset_y),
+        )
 
     def take_damage(
         self,

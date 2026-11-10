@@ -13,6 +13,7 @@ from config.const import (
     PLAYER_MOVE_DELAY
 )
 from modules.AnimationManager import AnimationManager
+from modules.assets import load_sound
 from modules.Bomb import Bomb
 from modules.Entity import Entity, EntityType
 
@@ -59,7 +60,7 @@ class Player(Entity):
 
     def load_sounds(self):
         try:
-            self.sounds['death'] = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'death_sound.wav'))
+            self.sounds['death'] = load_sound(os.path.join(PATH_SOUNDS, 'death_sound.wav'))
         except Exception as e:
             print(f"[ERRO] Não foi possível carregar os sons do jogador: {e}")
 
@@ -166,11 +167,10 @@ class Player(Entity):
         self,
         game
     ):
-        from modules.EntityFactory import EntityFactory
         if any(e.entity_type == EntityType.BOMB and e.position == self.position
                for e in game.entity_manager.entities):
             return
-        bomb = EntityFactory.create_bomb(self.position, self.bomb_range, self)
+        bomb = Bomb(self.position, self.bomb_range, self)
         self.placed_bombs.append(bomb)
         game.entity_manager.add_entity(bomb)
         
@@ -196,15 +196,7 @@ class Player(Entity):
         if self.state == "alive" and now < self.invincible_until and (now // 100) % 2:
             return
 
-        pixel_x = self.position[0] * tile_size + offset_x
-        pixel_y = self.position[1] * tile_size + offset_y
-        
-        current_frame = self.animation_manager.get_current_frame()
-        
-        if current_frame.get_size() != (tile_size, tile_size):
-            current_frame = pygame.transform.scale(current_frame, (tile_size, tile_size))
-        
-        screen.blit(current_frame, (pixel_x, pixel_y))
+        super().render(screen, offset_x, offset_y, tile_size)
 
     def is_death_complete(self) -> bool:
         return self.state == "dead"

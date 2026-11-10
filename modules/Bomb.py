@@ -4,7 +4,9 @@ from typing import Tuple
 import pygame
 from config.const import EXPLOSION_TIMER, PATH_ITEMS, PATH_SOUNDS
 from modules.AnimationManager import AnimationManager
+from modules.assets import load_sound
 from modules.Entity import Entity, EntityType
+from modules.Explosion import Explosion
 
 
 class Bomb(Entity):
@@ -17,34 +19,28 @@ class Bomb(Entity):
         super().__init__("Bomb", position, EntityType.BOMB)
         self.explosion_range = explosion_range
         self.owner = owner
-        self.timer = EXPLOSION_TIMER
+        self.placed_at = pygame.time.get_ticks()
         self.exploded = False
 
         # animações
         self.animation_manager = AnimationManager()
-        self.load_animations()
+        self.animation_manager.load_animation("bomb", PATH_ITEMS, 9, "dynamite_{}.png")
 
         # som
-        self.place_sound = pygame.mixer.Sound(os.path.join(PATH_SOUNDS, 'place_bomb.wav'))
-        self.place_sound.play()
-
-
-    def load_animations(self):
-        """Carrega a animação da bomba"""
-        self.animation_manager.load_animation("bomb", PATH_ITEMS, 9, "dynamite_{}.png")
-        self.animation_manager.set_animation("bomb")
+        load_sound(os.path.join(PATH_SOUNDS, 'place_bomb.wav')).play()
 
     def update(
         self, 
         game
     ):
         current_time = pygame.time.get_ticks()
+        elapsed = current_time - self.placed_at
 
-        self.timer -= 1
-        if self.timer <= 0:
+        if elapsed >= EXPLOSION_TIMER:
             self.explode(game)
         else:
-            self.animation_manager.animation_speed = max(50, 200 - (180 - self.timer) * 2)
+            # pavio acelera: 200 ms por quadro, caindo até 50 ms
+            self.animation_manager.animation_speed = max(50, 200 - elapsed // 8)
             self.animation_manager.update(current_time)
 
     def explode(
@@ -53,24 +49,6 @@ class Bomb(Entity):
     ):
         self.exploded = True
         self.alive = False
-
-        from modules.EntityFactory import EntityFactory
-        explosion = EntityFactory.create_explosion(
-            self.position,
-            self.explosion_range,
-            self.owner,
-            game,
+        game.entity_manager.add_entity(
+            Explosion(self.position, self.explosion_range, self.owner, game)
         )
-
-        game.entity_manager.add_entity(explosion)
-
-    def render(self, screen, offset_x: int, offset_y: int, tile_size: int):
-        pixel_x = self.position[0] * tile_size + offset_x
-        pixel_y = self.position[1] * tile_size + offset_y
-        
-        current_frame = self.animation_manager.get_current_frame()
-        
-        if current_frame.get_size() != (tile_size, tile_size):
-            current_frame = pygame.transform.scale(current_frame, (tile_size, tile_size))
-        
-        screen.blit(current_frame, (pixel_x, pixel_y))

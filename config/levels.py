@@ -22,11 +22,11 @@ LEVELS: Dict[int, List[List[int]]] = {
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ],
         'terrain': {
-            'variations': 4,
+            'variations': 3,
             'asset_name': 'grass',
         },
         'block': {
-            'variations': 5,
+            'variations': 4,
             'asset_name': 'wood',
         }
     },
@@ -49,11 +49,11 @@ LEVELS: Dict[int, List[List[int]]] = {
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ],
         'terrain': {
-            'variations': 2,
+            'variations': 1,
             'asset_name': 'sand',
         },
         'block': {
-            'variations': 2,
+            'variations': 1,
             'asset_name': 'rock',
         }
     },
@@ -76,11 +76,11 @@ LEVELS: Dict[int, List[List[int]]] = {
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ],
         'terrain': {
-            'variations': 3,
+            'variations': 2,
             'asset_name': 'water',
         },
         'block': {
-            'variations': 2,
+            'variations': 1,
             'asset_name': 'sand',
         }
     },
@@ -103,11 +103,11 @@ LEVELS: Dict[int, List[List[int]]] = {
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
         ],
         'terrain': {
-            'variations': 2,
+            'variations': 1,
             'asset_name': 'rock',
         },
         'block': {
-            'variations': 2,
+            'variations': 1,
             'asset_name': 'wall',
         }
     },
